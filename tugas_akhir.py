@@ -87,6 +87,19 @@ class BST:
     def tambah_resi(self, node):
         self.root = self.insert(self.root, node)
 
+    # cek apakah no resi sudah ada (KEY harus unik)
+    def cari(self, root, no_resi):
+
+        if root is None:
+            return False
+
+        if no_resi == root.no_resi:
+            return True
+        elif no_resi < root.no_resi:
+            return self.cari(root.left, no_resi)
+        else:
+            return self.cari(root.right, no_resi)
+
     # INORDER
     def inorder(self, root):
 
@@ -119,6 +132,16 @@ class BST:
 
 hub = Graph()
 resi_bst = BST()
+
+
+# helper input angka (mencegah crash jika input bukan angka)
+def baca_int(prompt):
+    while True:
+        nilai = input(prompt)
+        if nilai.isdigit():
+            return int(nilai)
+        print("Input harus berupa angka")
+
 
 # custom data awal
 hub.tambah_hub("OKTAV")
@@ -158,7 +181,7 @@ while True:
 
                 kota1 = input("Kota asal : ")
                 kota2 = input("Kota tujuan : ")
-                jarak = int(input("Jarak KM : "))
+                jarak = baca_int("Jarak KM : ")
 
                 hub.tambah_rute(kota1, kota2, jarak)
 
@@ -195,20 +218,29 @@ while True:
 
                     no_resi = input("No Resi : ")
 
-                    # validasi no resi awal 2
+                    # validasi no resi: 4 digit angka, diawali '2' (NPM genap)
+                    if not no_resi.isdigit() or len(no_resi) != 4:
+                        print("No resi harus 4 digit angka")
+                        continue
+
                     if no_resi[0] != "2":
                         print("No resi harus diawali angka 2")
+                        continue
+
+                    # validasi keunikan (KEY BST harus unik)
+                    if resi_bst.cari(resi_bst.root, no_resi):
+                        print("No resi sudah terdaftar")
                         continue
 
                     pengirim = input("Nama Pengirim : ")
                     asal = input("Kota Asal : ")
                     tujuan = input("Kota Tujuan : ")
-                    berat = int(input("Berat Paket : "))
+                    berat = baca_int("Berat Paket : ")
 
                     ada_rute, jarak = hub.cek_rute(asal, tujuan)
 
                     if ada_rute == False:
-                        print("Rute pengiriman belum tersedia")
+                        print("Rute pengiriman belum tersedia dalam jaringan!")
                     else:
 
                         biaya = (jarak * 2000) + (berat * 5000)
@@ -226,9 +258,13 @@ while True:
 
                         print("Input Resi Berhasil")
 
-                    lagi = input("Input lagi? (Y/N) : ")
+                    while True:
+                        lagi = input("Input lagi? (Y/N) : ").upper()
+                        if lagi in ("Y", "N"):
+                            break
+                        print("Masukkan Y atau N")
 
-                    if lagi.upper() == "N":
+                    if lagi == "N":
                         break
 
             # =====================================
